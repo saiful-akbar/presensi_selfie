@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_bloc.dart';
 import 'package:presensi_selfie/features/auth/presentation/pages/auth_page.dart';
 import 'package:presensi_selfie/features/home/presentation/pages/home_page.dart';
+import 'package:presensi_selfie/features/location/application/bloc/location_bloc.dart';
 import 'package:presensi_selfie/features/splash_screen/presentation/pages/splash_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -14,7 +19,10 @@ void main() {
 
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider<AuthBloc>(create: (context) => AuthBloc())],
+      providers: [
+        BlocProvider<AuthBloc>(create: (context) => AuthBloc()),
+        BlocProvider<LocationBloc>(create: (context) => LocationBloc()),
+      ],
       child: MyApp(),
     ),
   );
@@ -191,7 +199,7 @@ class MyApp extends StatelessWidget {
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 2,
-          margin: const EdgeInsets.all(8),
+          margin: const EdgeInsets.all(0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),

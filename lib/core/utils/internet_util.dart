@@ -1,6 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-class Internet {
+class InternetUtil {
   static Future<bool> isConnected() async {
     var connectivityResult = await Connectivity().checkConnectivity();
 

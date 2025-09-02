@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:presensi_selfie/core/utils/internet.dart';
+import 'package:presensi_selfie/core/constants/app_constant.dart';
+import 'package:presensi_selfie/core/utils/internet_util.dart';
 import 'package:presensi_selfie/core/widgets/app_scaffold.dart';
-import 'package:presensi_selfie/features/auth/application/bloc/auth_bloc.dart';
-import 'package:presensi_selfie/features/auth/application/bloc/auth_event.dart';
-import 'package:presensi_selfie/features/auth/application/bloc/auth_state.dart';
+import 'package:presensi_selfie/features/app/application/usecases/get_version_use_case.dart';
+import 'package:presensi_selfie/features/location/application/bloc/location_bloc.dart';
+import 'package:presensi_selfie/features/location/application/bloc/location_event.dart';
+import 'package:presensi_selfie/features/location/application/usecases/get_current_location_use_case.dart';
+import 'package:presensi_selfie/features/location/application/usecases/has_fake_location_use_case.dart';
+import 'package:presensi_selfie/features/location/application/usecases/has_location_permission_use_case.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -18,7 +22,7 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   // Periksa koneksi internet
   Future<bool> _checkInternetConnection() async {
-    final isConnected = await Internet.isConnected();
+    final isConnected = await InternetUtil.isConnected();
 
     if (!isConnected) {
       if (mounted) {
@@ -103,20 +107,22 @@ class _SplashPageState extends State<SplashPage> {
       return false;
     }
 
+    if (mounted) {
+      context.read<LocationBloc>().add(
+        SetLocation(await GetCurrentLocationUseCase().handle()),
+      );
+    }
+
     return true;
   }
 
-  // Periksa akses lokasi
+  // Periksa izin lokasi
   Future<bool> _checkLocationPermission() async {
-    var permission = await Permission.location.status;
+    final hasPermission = HasLocationPermissionUseCase();
+    final hasFakeLocation = HasFakeLocationUseCase();
 
-    // Minta izin kalau ditolak
-    if (permission.isDenied) {
-      permission = await Permission.location.request();
-    }
-
-    // Jika akses ditolah buka pengaturan.
-    if (permission.isDenied || permission.isPermanentlyDenied) {
+    // Periksa izin lokasi pada aplikasi
+    if (!await hasPermission.handle()) {
       if (mounted) {
         showDialog(
           context: context,
@@ -130,7 +136,7 @@ class _SplashPageState extends State<SplashPage> {
                 color: Theme.of(context).colorScheme.onSurface,
               ),
               content: Text(
-                'Aplikasi membutuhkan akses lokasi (GPS) untuk keperluan presensi karyawan.',
+                'Aplikasi membutuhkan akses lokasi (GPS) untuk keperluan presensi.',
               ),
               contentTextStyle: TextStyle(
                 fontSize: 16,
@@ -151,18 +157,168 @@ class _SplashPageState extends State<SplashPage> {
       return false;
     }
 
+    // Periksa apakah menggunakan lokasi palsu atau tidak
+    if (await hasFakeLocation.handle()) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Warning'),
+              titleTextStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              content: Text('Anda terdeteksi menggunakan fake GPS.'),
+              contentTextStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            );
+          },
+        );
+      }
+
+      return false;
+    }
+
     return true;
+  }
+
+  // Periksa version
+  Future<bool> _checkVersion() async {
+    try {
+      final useCase = GetVersionUseCase();
+      final app = await useCase.handle();
+      final currentVersion = AppConstant.version;
+
+      if (app.appVersion != currentVersion) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Informasi'),
+                titleTextStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                content: Text(
+                  'Terdapat versi terbaru, Silakan perbarui aplikasi.',
+                ),
+                contentTextStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                actions: [
+                  FilledButton(onPressed: () {}, child: Text('Perbarui')),
+
+                  if (!app.isUrgentUpdate)
+                    FilledButton(
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/login');
+                      },
+                      child: Text('Lewati'),
+                    ),
+                ],
+              );
+            },
+          );
+        }
+
+        return false;
+      }
+
+      if (app.isMaintenance) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Informasi'),
+                titleTextStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                content: Text(
+                  'Maaf, sedang ada perbaikan. Silakan coba lagi nanti.',
+                ),
+                contentTextStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                actions: [
+                  FilledButton(
+                    onPressed: () {
+                      SystemNavigator.pop();
+                    },
+                    child: Text('Ok'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Informasi'),
+              titleTextStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              content: Text('Terjadi kesalahan saat mengambil data.'),
+              contentTextStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              actions: [
+                FilledButton(
+                  onPressed: () {
+                    SystemNavigator.pop();
+                  },
+                  child: Text('Ok'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+
+      return false;
+    }
   }
 
   // Pemeriksaan prizinan.
   Future<void> _initApp() async {
-    if (!await _checkCameraPermission()) return;
     if (!await _checkLocationPermission()) return;
+    if (!await _checkCameraPermission()) return;
     if (!await _checkInternetConnection()) return;
+    if (!await _checkVersion()) return;
 
     // Perisan autentikasi.
     if (mounted) {
-      context.read<AuthBloc>().add(CheckAuth());
+      Navigator.pushReplacementNamed(context, '/login');
     }
   }
 
@@ -174,27 +330,14 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state.token == null) {
-          Navigator.pushReplacementNamed(context, '/login');
-        } else {
-          Navigator.pushReplacementNamed(context, '/home');
-        }
-      },
-      child: AppScaffold(
-        navigationBarColor: Theme.of(context).colorScheme.primary,
-        navigationBarIconColor: Brightness.light,
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          body: Center(
-            child: Image.asset(
-              'assets/images/icon.png',
-              width: 160,
-              height: 160,
-            ),
-          ),
+    return AppScaffold(
+      navigationBarColor: Theme.of(context).colorScheme.primary,
+      navigationBarIconColor: Brightness.light,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        body: Center(
+          child: Image.asset('assets/images/icon.png', width: 160, height: 160),
         ),
       ),
     );

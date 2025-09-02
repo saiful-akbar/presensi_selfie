@@ -1,4 +1,4 @@
-import 'package:presensi_selfie/features/auth/data/datasources/auth_data.dart';
+import 'package:presensi_selfie/features/auth/infrastructure/datasources/auth_data.dart';
 
 class GetAuthTokenUseCase {
   static final AuthData _data = AuthData();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:presensi_selfie/core/widgets/app_scaffold.dart';
 import 'package:presensi_selfie/features/check_absence/presentation/pages/check_absence_page.dart';
 import 'package:presensi_selfie/features/home/presentation/pages/home_tab.dart';
+import 'package:presensi_selfie/features/home/presentation/widgets/check_location.dart';
 import 'package:presensi_selfie/features/profile/presentation/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final List<Widget> _tabs = [HomeTab(), CheckAbsencePage(), ProfilePage()];
+
   int _currentIndex = 0;
 
   @override
@@ -36,19 +38,10 @@ class _HomePageState extends State<HomePage> {
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
-          actions: [
-            Text(
-              'Lokasi terdeteksi',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-                color: Colors.green[700],
-              ),
-            ),
-          ],
+          actions: [CheckLocation()],
           actionsPadding: EdgeInsets.only(right: 18),
         ),
-        body: _tabs[_currentIndex],
+        body: SingleChildScrollView(child: _tabs[_currentIndex]),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: Colors.white,

@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:presensi_selfie/core/utils/notification.dart';
-import 'package:presensi_selfie/core/utils/random_string.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:presensi_selfie/core/utils/notification_util.dart';
 import 'package:presensi_selfie/core/widgets/loading_dialog.dart';
-import 'package:presensi_selfie/features/auth/application/usecases/save_auth_token_use_case.dart';
+import 'package:presensi_selfie/features/auth/application/bloc/auth_bloc.dart';
+import 'package:presensi_selfie/features/auth/application/bloc/auth_event.dart';
+import 'package:presensi_selfie/features/auth/application/usecases/login_use_case.dart';
+import 'package:presensi_selfie/features/auth/domain/entities/auth_user_entity.dart';
+import 'package:presensi_selfie/features/auth/infrastructure/dtos/login_dto.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -44,36 +48,29 @@ class _LoginFormState extends State<LoginForm> {
       return;
     }
 
-    if (_userId.text != '4154' || _password.text != '4154') {
-      if (mounted) {
-        notification(
-          context,
-          message: 'Periksa kembali ID karyawan atau kata sandi anda.',
-          backgroundColor: Theme.of(context).colorScheme.error,
-        );
-      }
-
-      return;
-    }
-
     _showLoading();
 
-    final String randomString = RandomString.generate(32);
+    final useCase = LoginUseCase(
+      LoginDTO(username: _userId.text, password: _password.text),
+    );
 
     try {
-      await SaveAuthTokenUseCase.handle(randomString);
+      final AuthUserEntity? user = await useCase.handle();
 
-      if (mounted) {
+      if (user != null && mounted) {
+        context.read<AuthBloc>().add(SaveAuthToken(user.token));
+        context.read<AuthBloc>().add(SaveAuthUser(user));
+
         Navigator.pop(context);
         Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-
-        notification(
+        FocusManager.instance.primaryFocus?.unfocus();
+        NotificationUtil(
           context,
-          message: 'Login gagal.',
+          message: e.toString(),
           backgroundColor: Theme.of(context).colorScheme.error,
         );
       }
@@ -118,7 +115,9 @@ class _LoginFormState extends State<LoginForm> {
                   ? 'Kata sandi tidak boleh kosong'
                   : null;
             },
-            onFieldSubmitted: (value) => _submitForm(),
+            onFieldSubmitted: (value) {
+              _submitForm();
+            },
           ),
           ElevatedButton.icon(
             onPressed: _submitForm,
