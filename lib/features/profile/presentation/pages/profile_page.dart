@@ -9,10 +9,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Future<void> _logout() async {
-    await LogoutUseCase.handle();
-
+  void _logout() {
     if (mounted) {
+      LogoutUseCase.handle(context);
       Navigator.pushReplacementNamed(context, '/login');
     }
   }

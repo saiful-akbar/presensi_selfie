@@ -20,22 +20,7 @@ class _CardHeroState extends State<CardHero> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 20,
-          children: [
-            CurrentDate(),
-            CurrentPresence(),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => {},
-                icon: Icon(Icons.fingerprint_outlined),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.onPrimary,
-                  foregroundColor: Theme.of(context).colorScheme.primary,
-                ),
-                label: Text('Absen Pulang'),
-              ),
-            ),
-          ],
+          children: [CurrentDate(), CurrentPresence()],
         ),
       ),
     );

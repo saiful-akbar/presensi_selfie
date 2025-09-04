@@ -20,13 +20,18 @@ class _AuthPageState extends State<AuthPage> {
     return AppScaffold(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        body: Center(
-          child: Padding(
-            padding: EdgeInsets.all(20),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              top: screenHeight * 0.15,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 50,
+              spacing: 40,
               children: [
                 AuthHeader(
                   paddingTop: paddingTop,

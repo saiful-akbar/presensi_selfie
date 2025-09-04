@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class CurrentPresence extends StatelessWidget {
@@ -28,15 +27,18 @@ class CurrentPresence extends StatelessWidget {
                   children: [
                     Text(
                       'Masuk',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                     Text(
                       '08:30',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
                         color: Colors.white,
-                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ],
@@ -55,15 +57,18 @@ class CurrentPresence extends StatelessWidget {
                   children: [
                     Text(
                       'Pulang',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                     Text(
                       '--:--',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
                         color: Colors.white,
-                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ],

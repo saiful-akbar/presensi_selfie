@@ -193,47 +193,6 @@ class _SplashPageState extends State<SplashPage> {
     try {
       final useCase = GetVersionUseCase();
       final app = await useCase.handle();
-      final currentVersion = AppConstant.version;
-
-      if (app.appVersion != currentVersion) {
-        if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Informasi'),
-                titleTextStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                content: Text(
-                  'Terdapat versi terbaru, Silakan perbarui aplikasi.',
-                ),
-                contentTextStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                actions: [
-                  FilledButton(onPressed: () {}, child: Text('Perbarui')),
-
-                  if (!app.isUrgentUpdate)
-                    FilledButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/login');
-                      },
-                      child: Text('Lewati'),
-                    ),
-                ],
-              );
-            },
-          );
-        }
-
-        return false;
-      }
 
       if (app.isMaintenance) {
         if (mounted) {
@@ -263,6 +222,50 @@ class _SplashPageState extends State<SplashPage> {
                     },
                     child: Text('Ok'),
                   ),
+                ],
+              );
+            },
+          );
+        }
+
+        return false;
+      }
+
+      if (app.appVersion != AppConstant.version) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Informasi'),
+                titleTextStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                content: Text(
+                  'Terdapat versi terbaru, Silakan perbarui aplikasi.',
+                ),
+                contentTextStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                actions: [
+                  app.isUrgentUpdate
+                      ? FilledButton(
+                          onPressed: () {
+                            SystemNavigator.pop();
+                          },
+                          child: Text('Ok'),
+                        )
+                      : FilledButton(
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(context, '/login');
+                          },
+                          child: Text('Lewati Pembaruan'),
+                        ),
                 ],
               );
             },

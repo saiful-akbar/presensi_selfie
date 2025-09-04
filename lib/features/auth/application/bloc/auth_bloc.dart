@@ -1,13 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_event.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_state.dart';
-import 'package:presensi_selfie/features/auth/application/usecases/get_auth_token_use_case.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthInitial()) {
     on<SaveAuthToken>(_saveToken);
     on<SaveAuthUser>(_saveUser);
-    on<CheckAuth>(_checkAuth);
+    on<DeleteAUthData>(_deleteData);
   }
 
   // Simpan token
@@ -20,14 +19,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthValue(token: state.token, user: event.user));
   }
 
-  // Periksa authentikasi
-  Future<void> _checkAuth(CheckAuth event, Emitter<AuthState> emit) async {
-    final String? token = await GetAuthTokenUseCase.handle();
-
-    if (token == null) {
-      emit(AuthInitial());
-    } else {
-      emit(AuthValue(token: token));
-    }
+  // Delete data
+  void _deleteData(DeleteAUthData event, Emitter<AuthState> emit) {
+    emit(AuthInitial());
   }
 }

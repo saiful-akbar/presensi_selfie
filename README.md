@@ -1,16 +1,17 @@
-# presensi_selfie
+# 1. Splash Screen.
 
-A new Flutter project.
+### 1.1. Periksa koneksi internet.
 
-## Getting Started
+### 1.2. Periksa izin kamera.
 
-This project is a starting point for a Flutter application.
+### 1.3. Periksa izin lokasi.
 
-A few resources to get you started if this is your first Flutter project:
+### 1.4. Periksa apakah perangkat menggunakan lokasi palsu (Fake GPS).
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 1.5. Cek versi aplikai ke backend.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# 2. Login
+
+### 2.1. Login user dengan ID-Karyawan dan Password.
+
+# 3. Home page.

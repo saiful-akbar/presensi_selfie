@@ -14,7 +14,7 @@ class NotificationUtil {
       SnackBar(
         showCloseIcon: true,
         closeIconColor: Colors.white,
-        duration: Duration(seconds: 10),
+        duration: Duration(seconds: 5),
         backgroundColor: backgroundColor,
         content: Text(
           message,

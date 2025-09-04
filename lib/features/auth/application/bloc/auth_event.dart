@@ -16,5 +16,5 @@ class SaveAuthUser extends AuthEvent {
   SaveAuthUser(this.user);
 }
 
-// Check auth
-class CheckAuth extends AuthEvent {}
+// Hapus data auth
+class DeleteAUthData extends AuthEvent {}

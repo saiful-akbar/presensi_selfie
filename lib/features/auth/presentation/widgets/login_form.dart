@@ -61,8 +61,10 @@ class _LoginFormState extends State<LoginForm> {
         context.read<AuthBloc>().add(SaveAuthToken(user.token));
         context.read<AuthBloc>().add(SaveAuthUser(user));
 
-        Navigator.pop(context);
-        Navigator.pushReplacementNamed(context, '/home');
+        if (mounted) {
+          Navigator.pop(context);
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       }
     } catch (e) {
       if (mounted) {
