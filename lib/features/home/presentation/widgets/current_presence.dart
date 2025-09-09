@@ -36,7 +36,7 @@ class CurrentPresence extends StatelessWidget {
                     Text(
                       '08:30',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 28,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
                       ),
@@ -64,9 +64,9 @@ class CurrentPresence extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '--:--',
+                      '17:30',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 28,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
                       ),

@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:presensi_selfie/core/utils/notification_util.dart';
-import 'package:presensi_selfie/core/widgets/loading_dialog.dart';
+import 'package:presensi_selfie/core/utils/alert_loading_util.dart';
+import 'package:presensi_selfie/core/utils/snackbar_notification_util.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_bloc.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_event.dart';
 import 'package:presensi_selfie/features/auth/application/usecases/login_use_case.dart';
 import 'package:presensi_selfie/features/auth/domain/entities/auth_user_entity.dart';
-import 'package:presensi_selfie/features/auth/infrastructure/dtos/login_dto.dart';
+import 'package:presensi_selfie/features/auth/application/dtos/login_dto.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -33,13 +33,7 @@ class _LoginFormState extends State<LoginForm> {
 
   // Show loading
   void _showLoading() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return LoadingDialog(message: 'Memproses');
-      },
-    );
+    AlertLoading(context: context, message: 'Memproses...');
   }
 
   // Submit form
@@ -50,12 +44,10 @@ class _LoginFormState extends State<LoginForm> {
 
     _showLoading();
 
-    final useCase = LoginUseCase(
-      LoginDTO(username: _userId.text, password: _password.text),
-    );
-
     try {
-      final AuthUserEntity? user = await useCase.handle();
+      final AuthUserEntity? user = await LoginUseCase.handle(
+        LoginDTO(username: _userId.text, password: _password.text),
+      );
 
       if (user != null && mounted) {
         context.read<AuthBloc>().add(SaveAuthToken(user.token));
@@ -70,13 +62,30 @@ class _LoginFormState extends State<LoginForm> {
       if (mounted) {
         Navigator.pop(context);
         FocusManager.instance.primaryFocus?.unfocus();
-        NotificationUtil(
+        SnackbarNotification(
           context,
           message: e.toString(),
           backgroundColor: Theme.of(context).colorScheme.error,
         );
       }
     }
+  }
+
+  // Validasi
+  String? _validation(String field, String? value) {
+    if (field == 'userId') {
+      if (value == null || value.isEmpty) {
+        return 'ID Karyawan tidak boleh kosong';
+      }
+    }
+
+    if (field == 'password') {
+      if (value == null || value.isEmpty) {
+        return 'Kata sandi tidak boleh kosong';
+      }
+    }
+
+    return null;
   }
 
   @override
@@ -91,17 +100,14 @@ class _LoginFormState extends State<LoginForm> {
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(label: Text('ID Karyawan')),
-            validator: (value) {
-              return (value == null || value.isEmpty)
-                  ? 'ID karyawan tidak boleh kosong.'
-                  : null;
-            },
+            validator: (value) => _validation('userId', value),
           ),
           TextFormField(
             controller: _password,
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.done,
             obscureText: !_showPassword,
+            validator: (value) => _validation('password', value),
             decoration: InputDecoration(
               label: Text('Kata Sandi'),
               suffixIcon: IconButton(
@@ -112,14 +118,6 @@ class _LoginFormState extends State<LoginForm> {
                 ),
               ),
             ),
-            validator: (value) {
-              return (value == null || value.isEmpty)
-                  ? 'Kata sandi tidak boleh kosong'
-                  : null;
-            },
-            onFieldSubmitted: (value) {
-              _submitForm();
-            },
           ),
           ElevatedButton.icon(
             onPressed: _submitForm,

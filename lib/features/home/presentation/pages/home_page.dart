@@ -20,35 +20,44 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return AppScaffold(
       child: Scaffold(
+        extendBody: false,
         body: _tabs[_currentIndex],
         bottomNavigationBar: SafeArea(
           child: Container(
-            margin: EdgeInsets.only(left: 20, right: 20, bottom: 16),
+            // margin: EdgeInsets.only(left: 20, right: 20, bottom: 16),
             decoration: BoxDecoration(
               color: Colors.transparent,
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(38),
+                topRight: Radius.circular(38),
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 3,
-                  offset: const Offset(0, 2),
+                  color: Colors.black12,
+                  blurRadius: 2,
+                  offset: const Offset(0, -1),
                 ),
               ],
             ),
             child: Theme(
               data: Theme.of(context).copyWith(splashColor: Colors.transparent),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(32),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(38),
+                  topRight: Radius.circular(38),
+                ),
                 child: BottomNavigationBar(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  backgroundColor: Theme.of(context).colorScheme.onPrimary,
                   elevation: 0,
                   currentIndex: _currentIndex,
                   type: BottomNavigationBarType.fixed,
-                  unselectedItemColor: Theme.of(context).colorScheme.onPrimary,
-                  selectedItemColor: Theme.of(context).colorScheme.onPrimary,
-                  unselectedFontSize: 12,
-                  selectedFontSize: 14,
+                  selectedItemColor: Theme.of(context).colorScheme.primary,
+                  selectedFontSize: 12,
                   selectedLabelStyle: TextStyle(fontWeight: FontWeight.w900),
+                  unselectedItemColor: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant,
+                  unselectedFontSize: 12,
                   unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w600),
                   onTap: (value) {
                     setState(() {

@@ -9,10 +9,10 @@ class Menu extends StatefulWidget {
 
 class _MenuState extends State<Menu> {
   final List<Map<String, dynamic>> menus = [
-    {'icon': Icons.apartment_outlined, 'label': 'Masuk'},
-    {'icon': Icons.home_outlined, 'label': 'Pulang'},
-    {'icon': Icons.nights_stay_outlined, 'label': 'Lembur'},
-    {'icon': Icons.checklist_outlined, 'label': 'Cek Absen'},
+    {'icon': Icons.apartment_outlined, 'label': 'Masuk', 'route': '/check-in'},
+    {'icon': Icons.home_outlined, 'label': 'Pulang', 'route': '/check-out'},
+    {'icon': Icons.nights_stay_outlined, 'label': 'Lembur', 'route': null},
+    {'icon': Icons.checklist_outlined, 'label': 'Cek Absen', 'route': null},
   ];
 
   @override
@@ -34,7 +34,11 @@ class _MenuState extends State<Menu> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           children: menus.map((menu) {
-            return ButtonMenu(icon: menu['icon'], label: menu['label']);
+            return ButtonMenu(
+              icon: menu['icon'],
+              label: menu['label'],
+              route: menu['route'],
+            );
           }).toList(),
         ),
       ],
@@ -46,8 +50,14 @@ class _MenuState extends State<Menu> {
 class ButtonMenu extends StatelessWidget {
   final IconData icon;
   final String label;
+  final String? route;
 
-  const ButtonMenu({super.key, required this.icon, required this.label});
+  const ButtonMenu({
+    super.key,
+    required this.icon,
+    required this.label,
+    this.route,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +72,11 @@ class ButtonMenu extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(8),
           child: InkWell(
-            onTap: () => {},
+            onTap: () {
+              if (route is String) {
+                Navigator.pushNamed(context, route!);
+              }
+            },
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.all(10),

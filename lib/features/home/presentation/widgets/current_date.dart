@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class CurrentDate extends StatefulWidget {
-  const CurrentDate({super.key});
+  final Color color;
+
+  const CurrentDate({super.key, this.color = Colors.white});
 
   @override
   State<CurrentDate> createState() => _CurrentDateState();
@@ -48,14 +50,14 @@ class _CurrentDateState extends State<CurrentDate> {
         Text(
           _date,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Colors.white,
+            color: widget.color,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           _time,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Colors.white,
+            color: widget.color,
             fontWeight: FontWeight.bold,
           ),
         ),

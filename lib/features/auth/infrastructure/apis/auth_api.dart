@@ -1,19 +1,18 @@
 import 'dart:convert';
-import 'package:http/http.dart';
 import 'package:presensi_selfie/core/constants/api_endpoint_constant.dart';
-import 'package:presensi_selfie/core/utils/activity_log_util.dart';
+import 'package:presensi_selfie/core/utils/activity_logs_util.dart';
+import 'package:presensi_selfie/core/utils/api_util.dart';
 import 'package:presensi_selfie/features/auth/domain/entities/auth_user_entity.dart';
 import 'package:presensi_selfie/features/auth/domain/repositories/auth_api_repository.dart';
-import 'package:presensi_selfie/features/auth/infrastructure/dtos/login_dto.dart';
+import 'package:presensi_selfie/features/auth/application/dtos/login_dto.dart';
 
 class AuthApi extends AuthApiRepository {
   @override
   Future<AuthUserEntity> login(LoginDTO dto) async {
     try {
-      final response = await post(
-        Uri.https(ApiEndpointConstant.baseUrl, ApiEndpointConstant.login),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(dto.toJson()),
+      final response = await Api.post(
+        ApiEndpointConstant.login,
+        body: dto.toJson(),
       );
 
       if (response.statusCode != 200) {

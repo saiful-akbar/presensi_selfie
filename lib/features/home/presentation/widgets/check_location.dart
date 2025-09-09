@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:presensi_selfie/core/utils/notification_util.dart';
+import 'package:presensi_selfie/core/utils/snackbar_notification_util.dart';
 import 'package:presensi_selfie/features/location/application/bloc/location_bloc.dart';
 import 'package:presensi_selfie/features/location/application/bloc/location_event.dart';
 import 'package:presensi_selfie/features/location/application/usecases/get_current_location_use_case.dart';
@@ -18,10 +18,8 @@ class _CheckLocationState extends State<CheckLocation> {
 
   // Mengambil data lokasi
   Future<void> _getLocation() async {
-    final location = GetCurrentLocationUseCase();
-
     try {
-      LocationEntity currentLocation = await location.handle();
+      LocationEntity currentLocation = await GetCurrentLocationUseCase.handle();
 
       setState(() {
         locationDetected = true;
@@ -32,7 +30,7 @@ class _CheckLocationState extends State<CheckLocation> {
       }
     } catch (e) {
       if (mounted) {
-        NotificationUtil(
+        SnackbarNotification(
           context,
           message: 'Error - Terjadi kesalahan saat mengambil lokasi.',
         );

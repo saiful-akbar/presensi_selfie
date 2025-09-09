@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:presensi_selfie/core/constants/app_constant.dart';
+import 'package:presensi_selfie/core/utils/alert_util.dart';
 import 'package:presensi_selfie/core/utils/internet_util.dart';
 import 'package:presensi_selfie/core/widgets/app_scaffold.dart';
 import 'package:presensi_selfie/features/app/application/usecases/get_version_use_case.dart';
@@ -26,33 +27,16 @@ class _SplashPageState extends State<SplashPage> {
 
     if (!isConnected) {
       if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Tidak ada koneksi internet!'),
-              titleTextStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              content: Text(
-                'Pastikan perangkat terhubung ke internet untuk melanjutkan menggunakan aplikasi.',
-              ),
-              contentTextStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              actions: [
-                FilledButton(
-                  onPressed: () => SystemNavigator.pop(),
-                  child: Text('Tutup'),
-                ),
-              ],
-            );
-          },
+        Alert(
+          context,
+          title: Text('Informasi'),
+          content: Text('Tidak ada koneksi internet.'),
+          actions: [
+            FilledButton(
+              onPressed: () => SystemNavigator.pop(),
+              child: Text('Tutup'),
+            ),
+          ],
         );
 
         return false;
@@ -74,33 +58,16 @@ class _SplashPageState extends State<SplashPage> {
     // Jika akses ditolah buka pengaturan.
     if (permission.isDenied || permission.isPermanentlyDenied) {
       if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Izin kamera ditolak!'),
-              titleTextStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              content: Text(
-                'Aplikasi membutuhkan akses kamera untuk keperluan presensi karyawan.',
-              ),
-              contentTextStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              actions: [
-                FilledButton(
-                  onPressed: () => openAppSettings(),
-                  child: Text('Buka pengaturan'),
-                ),
-              ],
-            );
-          },
+        Alert(
+          context,
+          title: Text('Informasi'),
+          content: Text('Izin kamera ditolak!'),
+          actions: [
+            FilledButton(
+              onPressed: () => openAppSettings(),
+              child: Text('Buka pengaturan'),
+            ),
+          ],
         );
       }
 
@@ -109,7 +76,7 @@ class _SplashPageState extends State<SplashPage> {
 
     if (mounted) {
       context.read<LocationBloc>().add(
-        SetLocation(await GetCurrentLocationUseCase().handle()),
+        SetLocation(await GetCurrentLocationUseCase.handle()),
       );
     }
 
@@ -124,33 +91,16 @@ class _SplashPageState extends State<SplashPage> {
     // Periksa izin lokasi pada aplikasi
     if (!await hasPermission.handle()) {
       if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Izin lokasi ditolak!'),
-              titleTextStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              content: Text(
-                'Aplikasi membutuhkan akses lokasi (GPS) untuk keperluan presensi.',
-              ),
-              contentTextStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              actions: [
-                FilledButton(
-                  onPressed: () => openAppSettings(),
-                  child: Text('Buka pengaturan'),
-                ),
-              ],
-            );
-          },
+        Alert(
+          context,
+          title: Text('Informasi'),
+          content: Text('Izin lokasi ditolak!'),
+          actions: [
+            FilledButton(
+              onPressed: () => openAppSettings(),
+              child: Text('Buka pengaturan'),
+            ),
+          ],
         );
       }
 
@@ -160,25 +110,10 @@ class _SplashPageState extends State<SplashPage> {
     // Periksa apakah menggunakan lokasi palsu atau tidak
     if (await hasFakeLocation.handle()) {
       if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Warning'),
-              titleTextStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              content: Text('Anda terdeteksi menggunakan fake GPS.'),
-              contentTextStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            );
-          },
+        Alert(
+          context,
+          title: Text('Warning'),
+          content: Text('Anda terdeteksi menggunakan fake GPS!'),
         );
       }
 
@@ -194,81 +129,48 @@ class _SplashPageState extends State<SplashPage> {
       final useCase = GetVersionUseCase();
       final app = await useCase.handle();
 
+      // Periksa apakah sedang ada maintenance atau tidak.
       if (app.isMaintenance) {
         if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Informasi'),
-                titleTextStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                content: Text(
-                  'Maaf, sedang ada perbaikan. Silakan coba lagi nanti.',
-                ),
-                contentTextStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                actions: [
-                  FilledButton(
-                    onPressed: () {
-                      SystemNavigator.pop();
-                    },
-                    child: Text('Ok'),
-                  ),
-                ],
-              );
-            },
+          Alert(
+            context,
+            title: Text('Informasi'),
+            content: Text('Sedang ada perbaikan, silakan coba lagi nanti.'),
+            actions: [
+              FilledButton(
+                onPressed: () => SystemNavigator.pop(),
+                child: Text('Ok'),
+              ),
+            ],
           );
         }
 
         return false;
       }
 
+      // Periksa apakah versi aplikasi dengan versi server berbeda atau tidak.
+      // dan periksa apakah ada urget updaite atau tidak.
       if (app.appVersion != AppConstant.version) {
         if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Informasi'),
-                titleTextStyle: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                content: Text(
-                  'Terdapat versi terbaru, Silakan perbarui aplikasi.',
-                ),
-                contentTextStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                actions: [
-                  app.isUrgentUpdate
-                      ? FilledButton(
-                          onPressed: () {
-                            SystemNavigator.pop();
-                          },
-                          child: Text('Ok'),
-                        )
-                      : FilledButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/login');
-                          },
-                          child: Text('Lewati Pembaruan'),
-                        ),
-                ],
-              );
-            },
+          Alert(
+            context,
+            title: Text('Informasi'),
+            content: Text('Terdapat versi terbaru, Silakan perbarui aplikasi.'),
+            actions: [
+              app.isUrgentUpdate
+                  ? FilledButton(
+                      onPressed: () {
+                        SystemNavigator.pop();
+                      },
+                      child: Text('Ok'),
+                    )
+                  : FilledButton(
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/login');
+                      },
+                      child: Text('Lewati Pembaruan'),
+                    ),
+            ],
           );
         }
 
@@ -278,33 +180,16 @@ class _SplashPageState extends State<SplashPage> {
       return true;
     } catch (e) {
       if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Informasi'),
-              titleTextStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              content: Text('Terjadi kesalahan saat mengambil data.'),
-              contentTextStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              actions: [
-                FilledButton(
-                  onPressed: () {
-                    SystemNavigator.pop();
-                  },
-                  child: Text('Ok'),
-                ),
-              ],
-            );
-          },
+        Alert(
+          context,
+          title: Text('Informasi'),
+          content: Text('Terjadi kesalahan saat mengambil data.'),
+          actions: [
+            FilledButton(
+              onPressed: () => SystemNavigator.pop(),
+              child: Text('Ok'),
+            ),
+          ],
         );
       }
 
@@ -319,7 +204,6 @@ class _SplashPageState extends State<SplashPage> {
     if (!await _checkInternetConnection()) return;
     if (!await _checkVersion()) return;
 
-    // Perisan autentikasi.
     if (mounted) {
       Navigator.pushReplacementNamed(context, '/login');
     }
@@ -340,7 +224,8 @@ class _SplashPageState extends State<SplashPage> {
         resizeToAvoidBottomInset: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
         body: Center(
-          child: Image.asset('assets/images/icon.png', width: 160, height: 160),
+          // child: Image.asset('assets/images/icon.png', width: 160, height: 160),
+          child: CircularProgressIndicator(color: Colors.white),
         ),
       ),
     );

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class NotificationUtil {
+class SnackbarNotification {
   final BuildContext context;
   final String message;
   final Color? backgroundColor;
 
-  NotificationUtil(
+  SnackbarNotification(
     this.context, {
     required this.message,
     this.backgroundColor,

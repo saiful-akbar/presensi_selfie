@@ -1,4 +1,4 @@
-import 'package:presensi_selfie/features/location/data/datasources/location_data.dart';
+import 'package:presensi_selfie/features/location/infrastructure/data/location_data.dart';
 
 class HasLocationServiceUseCase {
   final data = LocationData();
