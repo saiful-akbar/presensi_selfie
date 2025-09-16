@@ -5,9 +5,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_bloc.dart';
 import 'package:presensi_selfie/features/auth/presentation/pages/auth_page.dart';
 import 'package:presensi_selfie/features/home/presentation/pages/home_page.dart';
-import 'package:presensi_selfie/features/location/application/bloc/location_bloc.dart';
-import 'package:presensi_selfie/features/presence/presentation/pages/check_in_page.dart';
-import 'package:presensi_selfie/features/presence/presentation/pages/check_out_page.dart';
+import 'package:presensi_selfie/features/attendance/presentation/pages/check_in_page.dart';
+import 'package:presensi_selfie/features/attendance/presentation/pages/check_out_page.dart';
 import 'package:presensi_selfie/features/splash_screen/presentation/pages/splash_page.dart';
 import 'package:presensi_selfie/theme.dart';
 
@@ -22,24 +21,13 @@ void main() async {
 
   runApp(
     MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthBloc>(create: (context) => AuthBloc()),
-        BlocProvider<LocationBloc>(create: (context) => LocationBloc()),
-      ],
+      providers: [BlocProvider<AuthBloc>(create: (context) => AuthBloc())],
       child: MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  static final primaryTextColor = Color.fromRGBO(24, 24, 24, 1);
-  static final secondaryTextColor = Color.fromRGBO(149, 149, 149, 1);
-  static final primaryColor = Color.fromRGBO(65, 96, 136, 1);
-  static final secondaryColor = Color.fromRGBO(22, 174, 38, 1);
-  static final tertiaryColor = Color.fromRGBO(235, 134, 1, 1);
-  static final errorColor = Color.fromRGBO(207, 13, 13, 1);
-  static final double borderRadius = 8;
-
   static final Map<String, Widget Function(BuildContext)> routes = {
     '/': (context) => const SplashPage(),
     '/login': (context) => const AuthPage(),

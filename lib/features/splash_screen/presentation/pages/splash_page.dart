@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:presensi_selfie/core/constants/app_constant.dart';
-import 'package:presensi_selfie/core/utils/alert_util.dart';
-import 'package:presensi_selfie/core/utils/internet_util.dart';
+import 'package:presensi_selfie/core/utilities/alert_utility.dart';
+import 'package:presensi_selfie/core/utilities/camera_utility.dart';
+import 'package:presensi_selfie/core/utilities/internet_utility.dart';
+import 'package:presensi_selfie/core/utilities/location_utility.dart';
 import 'package:presensi_selfie/core/widgets/app_scaffold.dart';
 import 'package:presensi_selfie/features/app/application/usecases/get_version_use_case.dart';
-import 'package:presensi_selfie/features/location/application/bloc/location_bloc.dart';
-import 'package:presensi_selfie/features/location/application/bloc/location_event.dart';
-import 'package:presensi_selfie/features/location/application/usecases/get_current_location_use_case.dart';
-import 'package:presensi_selfie/features/location/application/usecases/has_fake_location_use_case.dart';
-import 'package:presensi_selfie/features/location/application/usecases/has_location_permission_use_case.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -21,26 +17,30 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  late InternetUtility _internet;
+  late AlertUtility _alert;
+  late CameraUtility _camera;
+  late LocationUtility _location;
+
   // Periksa koneksi internet
   Future<bool> _checkInternetConnection() async {
-    final isConnected = await InternetUtil.isConnected();
-
-    if (!isConnected) {
+    if (!await _internet.isConnected()) {
       if (mounted) {
-        Alert(
-          context,
+        _alert.show(
           title: Text('Informasi'),
           content: Text('Tidak ada koneksi internet.'),
           actions: [
-            FilledButton(
-              onPressed: () => SystemNavigator.pop(),
-              child: Text('Tutup'),
+            Expanded(
+              child: FilledButton(
+                onPressed: () => SystemNavigator.pop(),
+                child: Text('Tutup'),
+              ),
             ),
           ],
         );
-
-        return false;
       }
+
+      return false;
     }
 
     return true;
@@ -48,36 +48,31 @@ class _SplashPageState extends State<SplashPage> {
 
   // Periksa akses kamera
   Future<bool> _checkCameraPermission() async {
-    var permission = await Permission.camera.status;
+    var permission = await _camera.status();
 
     // Minta izin kalau ditolak
     if (permission.isDenied) {
-      permission = await Permission.camera.request();
+      permission = await _camera.requestPermission();
     }
 
     // Jika akses ditolah buka pengaturan.
     if (permission.isDenied || permission.isPermanentlyDenied) {
       if (mounted) {
-        Alert(
-          context,
+        _alert.show(
           title: Text('Informasi'),
           content: Text('Izin kamera ditolak!'),
           actions: [
-            FilledButton(
-              onPressed: () => openAppSettings(),
-              child: Text('Buka pengaturan'),
+            Expanded(
+              child: FilledButton(
+                onPressed: () => openAppSettings(),
+                child: Text('Buka pengaturan'),
+              ),
             ),
           ],
         );
       }
 
       return false;
-    }
-
-    if (mounted) {
-      context.read<LocationBloc>().add(
-        SetLocation(await GetCurrentLocationUseCase.handle()),
-      );
     }
 
     return true;
@@ -85,20 +80,23 @@ class _SplashPageState extends State<SplashPage> {
 
   // Periksa izin lokasi
   Future<bool> _checkLocationPermission() async {
-    final hasPermission = HasLocationPermissionUseCase();
-    final hasFakeLocation = HasFakeLocationUseCase();
+    PermissionStatus permission = await _location.hasPermission();
 
-    // Periksa izin lokasi pada aplikasi
-    if (!await hasPermission.handle()) {
+    if (permission.isDenied) {
+      permission = await _location.requestPermission();
+    }
+
+    if (permission.isDenied) {
       if (mounted) {
-        Alert(
-          context,
+        _alert.show(
           title: Text('Informasi'),
           content: Text('Izin lokasi ditolak!'),
           actions: [
-            FilledButton(
-              onPressed: () => openAppSettings(),
-              child: Text('Buka pengaturan'),
+            Expanded(
+              child: FilledButton(
+                onPressed: () => openAppSettings(),
+                child: Text('Buka pengaturan'),
+              ),
             ),
           ],
         );
@@ -107,13 +105,19 @@ class _SplashPageState extends State<SplashPage> {
       return false;
     }
 
-    // Periksa apakah menggunakan lokasi palsu atau tidak
-    if (await hasFakeLocation.handle()) {
+    if (await _location.isFake()) {
       if (mounted) {
-        Alert(
-          context,
+        _alert.show(
           title: Text('Warning'),
           content: Text('Anda terdeteksi menggunakan fake GPS!'),
+          actions: [
+            Expanded(
+              child: FilledButton(
+                onPressed: () => SystemNavigator.pop(),
+                child: Text('Tutup'),
+              ),
+            ),
+          ],
         );
       }
 
@@ -126,14 +130,12 @@ class _SplashPageState extends State<SplashPage> {
   // Periksa version
   Future<bool> _checkVersion() async {
     try {
-      final useCase = GetVersionUseCase();
-      final app = await useCase.handle();
+      final app = await GetVersionUseCase.handle();
 
       // Periksa apakah sedang ada maintenance atau tidak.
       if (app.isMaintenance) {
         if (mounted) {
-          Alert(
-            context,
+          _alert.show(
             title: Text('Informasi'),
             content: Text('Sedang ada perbaikan, silakan coba lagi nanti.'),
             actions: [
@@ -152,24 +154,24 @@ class _SplashPageState extends State<SplashPage> {
       // dan periksa apakah ada urget updaite atau tidak.
       if (app.appVersion != AppConstant.version) {
         if (mounted) {
-          Alert(
-            context,
+          _alert.show(
             title: Text('Informasi'),
             content: Text('Terdapat versi terbaru, Silakan perbarui aplikasi.'),
             actions: [
-              app.isUrgentUpdate
-                  ? FilledButton(
-                      onPressed: () {
-                        SystemNavigator.pop();
-                      },
-                      child: Text('Ok'),
-                    )
-                  : FilledButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/login');
-                      },
-                      child: Text('Lewati Pembaruan'),
-                    ),
+              FilledButton(
+                onPressed: () {
+                  SystemNavigator.pop();
+                },
+                child: Text('Perbarui'),
+              ),
+
+              if (app.isUrgentUpdate)
+                FilledButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: Text('Lewati Pembaruan'),
+                ),
             ],
           );
         }
@@ -180,8 +182,7 @@ class _SplashPageState extends State<SplashPage> {
       return true;
     } catch (e) {
       if (mounted) {
-        Alert(
-          context,
+        _alert.show(
           title: Text('Informasi'),
           content: Text('Terjadi kesalahan saat mengambil data.'),
           actions: [
@@ -212,6 +213,12 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+
+    _alert = AlertUtility(context);
+    _internet = InternetUtility();
+    _camera = CameraUtility();
+    _location = LocationUtility();
+
     _initApp();
   }
 

@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // static final primaryTextColor = Color.fromRGBO(24, 24, 24, 1);
-  // static final secondaryTextColor = Color.fromRGBO(149, 149, 149, 1);
-  // static final primaryColor = Color.fromRGBO(65, 96, 136, 1);
-  // static final secondaryColor = Color.fromRGBO(22, 174, 38, 1);
-  // static final tertiaryColor = Color.fromRGBO(235, 134, 1, 1);
-  // static final errorColor = Color.fromRGBO(207, 13, 13, 1);
-  // static final double borderRadius = 8;
-
-  static final _primaryColor = const Color.fromARGB(255, 77, 112, 159);
-  static final _secondaryColor = const Color.fromRGBO(59, 180, 160, 1);
-  static final _tertiaryColor = const Color.fromRGBO(255, 209, 102, 1);
-  static final _errorColor = const Color.fromRGBO(239, 71, 111, 1);
+  static final _primaryColor = const Color.fromARGB(255, 82, 120, 171);
+  static final _secondaryColor = const Color.fromRGBO(17, 149, 148, 1);
+  static final _tertiaryColor = const Color.fromRGBO(255, 203, 72, 1);
+  static final _errorColor = const Color.fromRGBO(254, 66, 62, 1);
   static final _textPrimaryColor = const Color.fromRGBO(0, 0, 0, 1);
-  static final _textSecondaryColor = const Color.fromARGB(255, 139, 139, 139);
-  static final _backgroundColor = const Color.fromRGBO(247, 249, 250, 1);
+  static final _textSecondaryColor = Colors.grey.shade600;
+  static final _backgroundColor = Colors.grey.shade100;
   static final _borderRadius = 14.0;
 
   static ThemeData lightTheme() {
@@ -112,10 +104,24 @@ class AppTheme {
           color: _textSecondaryColor,
           fontWeight: FontWeight.w500,
         ),
-        floatingLabelStyle: TextStyle(
-          color: _primaryColor,
-          fontWeight: FontWeight.w500,
-        ),
+        floatingLabelStyle: WidgetStateTextStyle.resolveWith((states) {
+          if (states.contains(WidgetState.error)) {
+            return TextStyle(
+              color: _errorColor, // warna saat error
+              fontWeight: FontWeight.w600,
+            );
+          }
+          if (states.contains(WidgetState.focused)) {
+            return TextStyle(
+              color: _primaryColor, // warna saat fokus
+              fontWeight: FontWeight.w600,
+            );
+          }
+          return TextStyle(
+            color: _textSecondaryColor, // default
+            fontWeight: FontWeight.w500,
+          );
+        }),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -131,9 +137,9 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: Colors.white,
-        elevation: 2,
+        elevation: 1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        margin: const EdgeInsets.all(8),
+        margin: EdgeInsets.all(0),
       ),
     );
   }

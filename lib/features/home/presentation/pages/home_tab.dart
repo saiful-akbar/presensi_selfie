@@ -64,7 +64,7 @@ class _HomeTabState extends State<HomeTab> {
           ),
           body: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: Column(
                 spacing: 25,
                 crossAxisAlignment: CrossAxisAlignment.start,

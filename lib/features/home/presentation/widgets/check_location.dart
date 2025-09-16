@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:presensi_selfie/core/utils/snackbar_notification_util.dart';
-import 'package:presensi_selfie/features/location/application/bloc/location_bloc.dart';
-import 'package:presensi_selfie/features/location/application/bloc/location_event.dart';
-import 'package:presensi_selfie/features/location/application/usecases/get_current_location_use_case.dart';
-import 'package:presensi_selfie/features/location/domain/entities/location_entity.dart';
+import 'package:presensi_selfie/core/utilities/location_utility.dart';
+import 'package:presensi_selfie/core/utilities/notification_utility.dart';
 
 class CheckLocation extends StatefulWidget {
   const CheckLocation({super.key});
@@ -14,26 +10,22 @@ class CheckLocation extends StatefulWidget {
 }
 
 class _CheckLocationState extends State<CheckLocation> {
-  bool locationDetected = false;
+  late LocationUtility _location;
+  late NotificationUtility _notification;
+
+  bool _locationDetected = false;
 
   // Mengambil data lokasi
   Future<void> _getLocation() async {
     try {
-      LocationEntity currentLocation = await GetCurrentLocationUseCase.handle();
+      await _location.getLocation();
 
       setState(() {
-        locationDetected = true;
+        _locationDetected = true;
       });
-
-      if (mounted) {
-        context.read<LocationBloc>().add(SetLocation(currentLocation));
-      }
     } catch (e) {
       if (mounted) {
-        SnackbarNotification(
-          context,
-          message: 'Error - Terjadi kesalahan saat mengambil lokasi.',
-        );
+        _notification.error('Terjadi kesalahan saat mengambil lokasi.');
       }
     }
   }
@@ -41,12 +33,16 @@ class _CheckLocationState extends State<CheckLocation> {
   @override
   void initState() {
     super.initState();
+
+    _location = LocationUtility();
+    _notification = NotificationUtility(context);
+
     _getLocation();
   }
 
   @override
   Widget build(BuildContext context) {
-    return locationDetected
+    return _locationDetected
         ? Text(
             'Lokasi terdeteksi',
             style: TextStyle(

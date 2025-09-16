@@ -9,39 +9,45 @@ class Menu extends StatefulWidget {
 
 class _MenuState extends State<Menu> {
   final List<Map<String, dynamic>> menus = [
-    {'icon': Icons.apartment_outlined, 'label': 'Masuk', 'route': '/check-in'},
-    {'icon': Icons.home_outlined, 'label': 'Pulang', 'route': '/check-out'},
-    {'icon': Icons.nights_stay_outlined, 'label': 'Lembur', 'route': null},
-    {'icon': Icons.checklist_outlined, 'label': 'Cek Absen', 'route': null},
+    {'icon': Icons.apartment, 'label': 'Masuk', 'route': '/check-in'},
+    {'icon': Icons.home, 'label': 'Pulang', 'route': '/check-out'},
+    {'icon': Icons.nights_stay, 'label': 'Lembur', 'route': null},
+    {'icon': Icons.checklist, 'label': 'Cek Absen', 'route': null},
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 20,
-      children: [
-        Text(
-          'Menu',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w900,
-            color: Theme.of(context).colorScheme.onSurface,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
+        children: [
+          Text(
+            'Menu',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
-        ),
-        GridView.count(
-          crossAxisCount: 4,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          children: menus.map((menu) {
-            return ButtonMenu(
-              icon: menu['icon'],
-              label: menu['label'],
-              route: menu['route'],
-            );
-          }).toList(),
-        ),
-      ],
+          GridView.count(
+            crossAxisCount: 4,
+            mainAxisSpacing: 20,
+            crossAxisSpacing: 10,
+            childAspectRatio: 0.7,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: menus.map((menu) {
+              return ButtonMenu(
+                icon: menu['icon'],
+                label: menu['label'],
+                route: menu['route'],
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -69,7 +75,7 @@ class ButtonMenu extends StatelessWidget {
       children: [
         Material(
           elevation: 2,
-          color: Theme.of(context).colorScheme.primary,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(8),
           child: InkWell(
             onTap: () {
@@ -82,8 +88,8 @@ class ButtonMenu extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Icon(
                 icon,
-                color: Theme.of(context).colorScheme.onPrimary,
-                size: 35,
+                color: Theme.of(context).colorScheme.primary,
+                size: 40,
               ),
             ),
           ),
@@ -92,14 +98,14 @@ class ButtonMenu extends StatelessWidget {
           width: 75,
           child: Text(
             label,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             softWrap: true,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),

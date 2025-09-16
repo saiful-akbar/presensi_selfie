@@ -20,6 +20,7 @@ class _AuthPageState extends State<AuthPage> {
     return AppScaffold(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
         body: SafeArea(
           child: SingleChildScrollView(
             padding: EdgeInsets.only(

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:presensi_selfie/core/utils/alert_loading_util.dart';
-import 'package:presensi_selfie/core/utils/snackbar_notification_util.dart';
+import 'package:presensi_selfie/core/utilities/loading_utility.dart';
+import 'package:presensi_selfie/core/utilities/notification_utility.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_bloc.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_event.dart';
 import 'package:presensi_selfie/features/auth/application/usecases/login_use_case.dart';
@@ -22,7 +22,19 @@ class _LoginFormState extends State<LoginForm> {
   final _userId = TextEditingController(text: '');
   final _password = TextEditingController(text: '');
 
+  late LoadingUtility _loading;
+  late NotificationUtility _notification;
+
   bool _showPassword = false;
+
+  // Init state
+  @override
+  void initState() {
+    super.initState();
+
+    _loading = LoadingUtility(context);
+    _notification = NotificationUtility(context);
+  }
 
   // Toggle show or hide password
   void _togglePassword() {
@@ -31,18 +43,13 @@ class _LoginFormState extends State<LoginForm> {
     });
   }
 
-  // Show loading
-  void _showLoading() {
-    AlertLoading(context: context, message: 'Memproses...');
-  }
-
   // Submit form
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    _showLoading();
+    _loading.show('Memproses...');
 
     try {
       final AuthUserEntity? user = await LoginUseCase.handle(
@@ -62,11 +69,7 @@ class _LoginFormState extends State<LoginForm> {
       if (mounted) {
         Navigator.pop(context);
         FocusManager.instance.primaryFocus?.unfocus();
-        SnackbarNotification(
-          context,
-          message: e.toString(),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        );
+        _notification.error(e.toString());
       }
     }
   }

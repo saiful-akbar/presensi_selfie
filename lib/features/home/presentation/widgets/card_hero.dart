@@ -12,15 +12,18 @@ class CardHero extends StatefulWidget {
 class _CardHeroState extends State<CardHero> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Theme.of(context).colorScheme.primary,
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 20,
-          children: [CurrentDate(), CurrentPresence()],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Card(
+        color: Theme.of(context).colorScheme.primary,
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 20,
+            children: [CurrentDate(), CurrentPresence()],
+          ),
         ),
       ),
     );
