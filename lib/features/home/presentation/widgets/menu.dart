@@ -39,11 +39,7 @@ class _MenuState extends State<Menu> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: menus.map((menu) {
-              return ButtonMenu(
-                icon: menu['icon'],
-                label: menu['label'],
-                route: menu['route'],
-              );
+              return ButtonMenu(icon: menu['icon'], label: menu['label'], route: menu['route']);
             }).toList(),
           ),
         ],
@@ -58,12 +54,7 @@ class ButtonMenu extends StatelessWidget {
   final String label;
   final String? route;
 
-  const ButtonMenu({
-    super.key,
-    required this.icon,
-    required this.label,
-    this.route,
-  });
+  const ButtonMenu({super.key, required this.icon, required this.label, this.route});
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +77,7 @@ class ButtonMenu extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.all(10),
-              child: Icon(
-                icon,
-                color: Theme.of(context).colorScheme.primary,
-                size: 40,
-              ),
+              child: Icon(icon, size: 40, color: Theme.of(context).colorScheme.primary),
             ),
           ),
         ),
