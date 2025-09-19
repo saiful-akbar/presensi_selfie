@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:presensi_selfie/core/constants/app_constant.dart';
 import 'package:presensi_selfie/core/utilities/alert_utility.dart';
@@ -31,10 +32,7 @@ class _SplashPageState extends State<SplashPage> {
           content: Text('Tidak ada koneksi internet.'),
           actions: [
             Expanded(
-              child: FilledButton(
-                onPressed: () => SystemNavigator.pop(),
-                child: Text('Tutup'),
-              ),
+              child: ElevatedButton(onPressed: () => SystemNavigator.pop(), child: Text('Tutup')),
             ),
           ],
         );
@@ -80,13 +78,16 @@ class _SplashPageState extends State<SplashPage> {
 
   // Periksa izin lokasi
   Future<bool> _checkLocationPermission() async {
-    PermissionStatus permission = await _location.hasPermission();
+    LocationPermission permission = await _location.checkPermission();
 
-    if (permission.isDenied) {
+    // Periksa apakah memiliki izin akses lokasi.
+    // Jika tidak ada izin, request izin lokasi.
+    if (permission == LocationPermission.denied) {
       permission = await _location.requestPermission();
     }
 
-    if (permission.isDenied) {
+    // Jika request izin lokasi ditolak, tampilkan dialoh alert.
+    if (permission == LocationPermission.deniedForever) {
       if (mounted) {
         _alert.show(
           title: Text('Informasi'),
@@ -105,6 +106,7 @@ class _SplashPageState extends State<SplashPage> {
       return false;
     }
 
+    // Periksa apakah perangkat menggunakan lokasi palsu.
     if (await _location.isFake()) {
       if (mounted) {
         _alert.show(
@@ -112,10 +114,7 @@ class _SplashPageState extends State<SplashPage> {
           content: Text('Anda terdeteksi menggunakan fake GPS!'),
           actions: [
             Expanded(
-              child: FilledButton(
-                onPressed: () => SystemNavigator.pop(),
-                child: Text('Tutup'),
-              ),
+              child: FilledButton(onPressed: () => SystemNavigator.pop(), child: Text('Tutup')),
             ),
           ],
         );
@@ -138,12 +137,7 @@ class _SplashPageState extends State<SplashPage> {
           _alert.show(
             title: Text('Informasi'),
             content: Text('Sedang ada perbaikan, silakan coba lagi nanti.'),
-            actions: [
-              FilledButton(
-                onPressed: () => SystemNavigator.pop(),
-                child: Text('Ok'),
-              ),
-            ],
+            actions: [FilledButton(onPressed: () => SystemNavigator.pop(), child: Text('Ok'))],
           );
         }
 
@@ -185,12 +179,7 @@ class _SplashPageState extends State<SplashPage> {
         _alert.show(
           title: Text('Informasi'),
           content: Text('Terjadi kesalahan saat mengambil data.'),
-          actions: [
-            FilledButton(
-              onPressed: () => SystemNavigator.pop(),
-              child: Text('Ok'),
-            ),
-          ],
+          actions: [FilledButton(onPressed: () => SystemNavigator.pop(), child: Text('Ok'))],
         );
       }
 

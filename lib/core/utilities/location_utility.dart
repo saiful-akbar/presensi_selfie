@@ -1,40 +1,21 @@
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 
 class LocationUtility {
-  Future<PermissionStatus> hasPermission() async {
-    return await Permission.location.status;
+  // Cek izin lokasi
+  Future<LocationPermission> checkPermission() async {
+    return await Geolocator.checkPermission();
   }
 
   // Request izin lokasi
-  Future<PermissionStatus> requestPermission() async {
-    return await Permission.location.request();
+  Future<LocationPermission> requestPermission() async {
+    return await Geolocator.requestPermission();
   }
 
   // Periksa apakah lokasi aktif
-  Future<bool> isEnable() async {
+  Future<bool> serviceEnabled() async {
     return await Geolocator.isLocationServiceEnabled();
-  }
-
-  // Periksa apakah memiliki izin lokasi
-  Future<bool> isAllowed() async {
-    var permission = await Permission.location.status;
-
-    if (permission.isDenied) {
-      permission = await Permission.location.request();
-
-      if (permission.isDenied) {
-        return false;
-      }
-    }
-
-    if (permission.isPermanentlyDenied) {
-      return false;
-    }
-
-    return true;
   }
 
   // Periksa apakah lokasi palsu.
@@ -75,10 +56,7 @@ class LocationUtility {
     );
 
     try {
-      final response = await http.get(
-        url,
-        headers: {'User-Agent': 'flutter-presensi-app'},
-      );
+      final response = await http.get(url, headers: {'User-Agent': 'flutter-presensi-app'});
 
       final data = jsonDecode(response.body);
 

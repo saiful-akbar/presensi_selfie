@@ -1,16 +1,12 @@
-class AuthDepartementEntity {
+class AuthDepartmentEntity {
   final int id;
   final String code;
   final String name;
 
-  AuthDepartementEntity({
-    required this.id,
-    required this.code,
-    required this.name,
-  });
+  AuthDepartmentEntity({required this.id, required this.code, required this.name});
 
-  factory AuthDepartementEntity.fromJson(Map<String, dynamic> json) {
-    return AuthDepartementEntity(
+  factory AuthDepartmentEntity.fromJson(Map<String, dynamic> json) {
+    return AuthDepartmentEntity(
       id: json['id'],
       code: json['departement_code'],
       name: json['departement_name'],

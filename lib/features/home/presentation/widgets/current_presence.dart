@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:presensi_selfie/core/utilities/notification_utility.dart';
-import 'package:presensi_selfie/features/attendance/application/dtos/get_today_attendance_dto.dart';
+import 'package:presensi_selfie/features/attendance/application/bloc/attendance_bloc.dart';
+import 'package:presensi_selfie/features/attendance/application/bloc/attendance_event.dart';
+import 'package:presensi_selfie/features/attendance/application/dtos/today_attendance_dto.dart';
 import 'package:presensi_selfie/features/attendance/application/usecases/get_today_attendance_use_case.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -18,30 +20,54 @@ class CurrentPresence extends StatefulWidget {
 class _CurrentPresenceState extends State<CurrentPresence> {
   late NotificationUtility _notification;
 
-  String? _timeIn;
-  String? _timeOut;
+  String _timeIn = '00:00';
+  String _timeOut = '00:00';
+  bool _loading = true;
 
   // Request data attendance
   Future<void> _getTodayAttendance() async {
-    final auth = context.read<AuthBloc>().state;
-    final token = auth.token!;
-    final username = auth.user!.username;
+    final attedance = context.read<AttendanceBloc>().state.todayAttendance;
 
-    try {
-      final attedance = await GetTodayAttendanceUseCase.handle(
-        GetTodayAttendanceDTO(authToken: token, username: username),
-      );
+    if (attedance == null) {
+      final auth = context.read<AuthBloc>().state;
+      final token = auth.token!;
+      final username = auth.user!.username;
 
+      setState(() {
+        _loading = true;
+      });
+
+      try {
+        final response = await GetTodayAttendanceUseCase.handle(
+          TodayAttendanceDTO(authToken: token, username: username),
+        );
+
+        if (response != null) {
+          setState(() {
+            _timeIn = DateFormat('HH:mm').format(response.timeIn);
+            _timeOut = DateFormat('HH:mm').format(response.timeOut);
+          });
+
+          if (mounted) {
+            context.read<AttendanceBloc>().add(SaveTodayAttendance(response));
+          }
+        }
+      } catch (e) {
+        _notification.error(e.toString());
+      } finally {
+        setState(() {
+          _loading = false;
+        });
+      }
+    } else {
       setState(() {
         _timeIn = DateFormat('HH:mm').format(attedance.timeIn);
         _timeOut = DateFormat('HH:mm').format(attedance.timeOut);
       });
-    } catch (e) {
-      _notification.error(e.toString());
-      throw e.toString();
     }
   }
 
+  // Initial state.
   @override
   void initState() {
     super.initState();
@@ -83,16 +109,8 @@ class _CurrentPresenceState extends State<CurrentPresence> {
                       ),
                     ),
 
-                    _timeIn is String
-                        ? Text(
-                            _timeIn!,
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Shimmer.fromColors(
+                    _loading
+                        ? Shimmer.fromColors(
                             baseColor: Theme.of(context).colorScheme.primary,
                             highlightColor: Colors.grey.shade100,
                             child: Text(
@@ -102,6 +120,14 @@ class _CurrentPresenceState extends State<CurrentPresence> {
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
                               ),
+                            ),
+                          )
+                        : Text(
+                            _timeIn,
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
                             ),
                           ),
                   ],
@@ -127,16 +153,8 @@ class _CurrentPresenceState extends State<CurrentPresence> {
                       ),
                     ),
 
-                    _timeOut is String
-                        ? Text(
-                            _timeOut!,
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Shimmer.fromColors(
+                    _loading
+                        ? Shimmer.fromColors(
                             baseColor: Theme.of(context).colorScheme.primary,
                             highlightColor: Colors.grey.shade100,
                             child: Text(
@@ -146,6 +164,14 @@ class _CurrentPresenceState extends State<CurrentPresence> {
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
                               ),
+                            ),
+                          )
+                        : Text(
+                            _timeOut,
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
                             ),
                           ),
                   ],

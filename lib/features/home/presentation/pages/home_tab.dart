@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_bloc.dart';
 import 'package:presensi_selfie/features/auth/application/bloc/auth_state.dart';
-import 'package:presensi_selfie/features/auth/domain/entities/auth_departement_entity.dart';
+import 'package:presensi_selfie/features/auth/domain/entities/auth_department_entity.dart';
 import 'package:presensi_selfie/features/auth/domain/entities/auth_user_entity.dart';
 import 'package:presensi_selfie/features/home/presentation/widgets/card_hero.dart';
 import 'package:presensi_selfie/features/home/presentation/widgets/menu.dart';
@@ -20,25 +20,22 @@ class _HomeTabState extends State<HomeTab> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        final AuthUserEntity user = state.user!;
-        final AuthDepartementEntity departement = state.user!.departement;
+        final AuthUserEntity? user = state.user;
+        final AuthDepartmentEntity? departement = state.department;
 
         return Scaffold(
           appBar: AppBar(
             leadingWidth: 60,
             leading: Padding(
               padding: const EdgeInsets.only(left: 18),
-              child: CircleAvatar(
-                radius: 10,
-                child: Text('S', style: TextStyle(fontSize: 20)),
-              ),
+              child: CircleAvatar(radius: 10, child: Text('S', style: TextStyle(fontSize: 20))),
             ),
             title: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  user.name,
+                  user?.name ?? '',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -48,7 +45,7 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                 ),
                 Text(
-                  departement.name,
+                  departement?.name ?? '',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

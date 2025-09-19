@@ -5,10 +5,7 @@ class AuthLanguageEntity {
   AuthLanguageEntity({required this.langId, required this.langName});
 
   factory AuthLanguageEntity.fromJson(Map<String, dynamic> json) {
-    return AuthLanguageEntity(
-      langId: json['lang_id'],
-      langName: json['lang_name'],
-    );
+    return AuthLanguageEntity(langId: json['lang_id'], langName: json['lang_name']);
   }
 
   Map<String, dynamic> toJson() {

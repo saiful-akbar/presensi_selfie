@@ -22,7 +22,6 @@ class _CheckInPageState extends State<CheckInPage> {
 
     setState(() {
       final now = DateTime.now();
-
       _currentTime = DateFormat('HH:mm').format(now);
       _currentDate = DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(now);
     });

@@ -11,8 +11,8 @@ class DatabaseUtility {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'hris_mobile.db');
 
-    // Hapus database.
-    // await deleteDatabase(path);
+    // HANYA saat development
+    await deleteDatabase(path);
 
     // Buka atau buat database
     _db = await openDatabase(
@@ -20,10 +20,10 @@ class DatabaseUtility {
       version: 1,
       onCreate: (db, version) {
         db.execute('''
-          CREATE TABLE IF NOT EXISTS hris_mobile_log(
+          CREATE TABLE IF NOT EXISTS activity_logs(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            content TEXT NOT NULL,
+            username TEXT,
+            content TEXT,
             latlong TEXT,
             location TEXT,
             photo TEXT,
@@ -32,18 +32,20 @@ class DatabaseUtility {
         ''');
 
         db.execute('''
-          CREATE TABLE IF NOT EXISTS TABLE hris_attendance(
+          CREATE TABLE IF NOT EXISTS attendances(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            token TEXT NOT NULL,
-            username TEXT NOT NULL,
-            photo_in TEXT NOT NULL,
+            token TEXT,
+            username TEXT,
+            photo_in TEXT,
             photo_out TEXT,
-            time_in TEXT NOT NULL,
+            time_in TEXT,
             time_out TEXT,
-            location_in TEXT NOT NULL,
+            location_in TEXT,
             location_out TEXT,
-            latlong_in TEXT NOT NULL,
-            latlong_out TEXT,
+            latitude_in REAL,
+            latitude_out REAL,
+            longitude_in REAL,
+            longitude_out REAL,
             working_hours TEXT,
             overtime TEXT
           )

@@ -1,4 +1,4 @@
-enum AuthAreaEnum {
+enum AreaEnum {
   ho('Head Office'),
   saStay('SA 1 Toko'),
   saMobile('SA Mobile'),
@@ -7,5 +7,5 @@ enum AuthAreaEnum {
 
   final String description;
 
-  const AuthAreaEnum(this.description);
+  const AreaEnum(this.description);
 }

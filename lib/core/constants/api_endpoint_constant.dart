@@ -4,4 +4,5 @@ class ApiEndpointConstant {
   static const String checkVersion = '/api/api_hris_mobile_version_check';
   static const String getLocation = '/api/api_get_location';
   static const String getTodayAttendance = '/api/api_today_attendance';
+  static const String updateArea = '/api/api_change_area';
 }
